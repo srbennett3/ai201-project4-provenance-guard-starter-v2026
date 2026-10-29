@@ -39,6 +39,23 @@
 <!-- The path a submission takes, from arriving to the label a reader sees.
      Six or seven steps — this is the trace you wrote in Milestone 1. -->
 
+1. The text arrives at POST /submit. That route adds a content_id.
+2. detector.model_signal scores the text. It adds model_score.
+3. stylometry.style_signal scores the shape of the text. It adds style_score.
+4. scoring.combine_signals turns the two scores into one combined score.
+5. scoring.score_to_label turns that score into a guess and a label. Guess is human, unsure, or ai, and label is the sentence the reader sees.
+6. audit.log_decision writes that decision into the log.
+7. The route sends the response back. The reader sees the label.
+
+False positive trace: A person writing in common words and short sentences gets model_score 0.72 and style_score 0.70. The combined score is 0.71. The label says: We think this was probably written by an AI. They can send POST /appeal with the content_id and a reason. That 0.71 is why the AI line is 0.80.
+
+Endpoint shape:
+POST /submit
+In: text (string), creator_id (string).
+Out: content_id (string), guess (human, unsure, or ai), confidence (the combined score), label (the sentence), model_score (number), style_score (number).
+POST /appeal
+In: content_id (string), reasoning (string).
+Out: content_id (string), status (under_review), message (Your appeal is recorded.).
 
 
 ---
@@ -53,19 +70,25 @@
 
 ### Signal one — the model signal
 
-**What it measures:**
+**What it measures:** 
+Perplexity, how predictable the text is to gpt2. model_score is from 0 to 1. Higher means more likely AI.
 
 **Why that might differ between human and AI writing:**
+A model picks a likely next word, so text a model wrote is often easy to predict. Human writing wanders more.
 
 **What it can't see:**
+Common words in short, ordinary sentences. A real person writing that way would score like a machine.
 
 ### Signal two — the style signal
 
 **What it measures:**
+The shape of the text: sentence_length_spread, type_token_ratio, and punctuation_density. style_score is from 0 to 1. Higher means more likely AI.
 
 **Why that might differ between human and AI writing:**
+Generated sentences tend to stay even and mid-length, with a narrower vocabulary. Human sentences vary more in length.
 
 **What it can't see:**
+The meaning. Typos, broken-up sentences, and a pasted quotation would change the score.
 
 ### The combining rule
 
