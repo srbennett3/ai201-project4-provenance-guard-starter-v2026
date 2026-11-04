@@ -233,15 +233,27 @@ $ curl "http://127.0.0.1:5000/log?limit=3"
 
 **Moment 1**
 
-- *What I asked for:*
+- *What I asked for:* 
+I asked why the rice curl returned a huge HTML page.
+
 - *What came back:*
+The page was a Flask error. The bottom line was NameError: name 'detector' is not defined, on the model_signal call in app.py. The import detector line was missing.
+
 - *What I changed:*
+I added import detector inside submit, above the model_signal call. The next rice curl returned JSON, and model_score was 0.0673.
+
 
 **Moment 2**
 
 - *What I asked for:*
+I asked for steps to fix the combining rule. The even AI paragraph had combined to 0.2337, and the lumpy human paragraph had combined to 0.3522.
+
 - *What came back:*
+Drop the rule that keeps the lower score when the two signals are 0.30 apart. Use 0.3 times the model score plus 0.7 times the style score.
+
 - *What I changed:*
+I set WEIGHT_MODEL_SIGNAL to 0.3 and WEIGHT_STYLE_SIGNAL to 0.7 in config.py, and combine_signals to that sum. A new submit put the even AI paragraph at 0.6451 and the lumpy human paragraph at 0.3113.
+
 
 <!-- ═══════════════════════ UNIT 8 — THE TEST ═══════════════════════ -->
 
