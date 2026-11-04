@@ -147,11 +147,18 @@ The meaning. Typos, broken-up sentences, and a pasted quotation would change the
 ```bash
 $ curl -X POST http://127.0.0.1:5000/submit \
   -H "Content-Type: application/json" \
-  -d '{"text": "...", "creator_id": "..."}'
+  -d '{"text": "I burned the rice and ate cereal instead.", "creator_id": "writer-1"}'
 ```
 
 ```json
-
+{
+  "confidence": 0.0,
+  "content_id": "add867d2-ebe3-49df-a629-d99030329335",
+  "guess": "unsure",
+  "label": "placeholder",
+  "model_score": 0.0673,
+  "style_score": 0.0
+}
 ```
 
 **An appeal**
@@ -173,7 +180,22 @@ $ curl "http://127.0.0.1:5000/log?limit=3"
 ```
 
 ```json
-
+{
+  "count": 1,
+  "entries": [
+    {
+      "combined_score": 0.0,
+      "content_id": "add867d2-ebe3-49df-a629-d99030329335",
+      "creator_id": "writer-1",
+      "guess": "unsure",
+      "label": "placeholder",
+      "model_score": 0.0673,
+      "status": "decided",
+      "style_score": 0.0,
+      "timestamp": "2026-11-04T07:51:49+00:00"
+    }
+  ]
+}
 ```
 
 ---

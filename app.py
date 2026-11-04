@@ -201,16 +201,44 @@ def submit():
     """
     payload = request.get_json(silent=True) or {}
 
-    # TODO: delete this and build the route.
-    return jsonify({
-        "error": "not_implemented",
-        "message": "POST /submit isn't built yet — see the TODO in app.py.",
-        "you_sent": {
-            "text_length": len(payload.get("text", "")),
-            "creator_id": payload.get("creator_id"),
-        },
-    }), 501
+    # Reads the submitted text and the creator id.
+    text = payload.get("text", "")
+    creator_id = payload.get("creator_id", "")
 
+    # Builds an id the appeal route can look up later.
+    content_id = str(uuid.uuid4())
+
+    # Scores the text with the model signal.
+    import detector
+    model_score = detector.model_signal(text)
+
+    # Sets confidence, label, guess, and style_score to placeholders.
+    confidence = 0.0
+    label = "placeholder"
+    guess = "unsure"
+    style_score = 0.0
+
+    # Writes the submission to the audit log.
+    audit.log_decision(
+    content_id=content_id,
+    creator_id=creator_id,
+    guess=guess,
+    model_score=model_score,
+    style_score=style_score,
+    combined_score=confidence,
+    label=label,
+    status="decided",
+    )
+
+    # Returns the id, the model score, and the placeholders.
+    return jsonify({
+        "content_id": content_id,
+        "guess": guess,
+        "confidence": confidence,
+        "label": label,
+        "model_score": model_score,
+        "style_score": style_score,
+    })
 
 @app.post("/appeal")
 def appeal():
