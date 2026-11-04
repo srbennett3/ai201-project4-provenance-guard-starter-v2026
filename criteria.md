@@ -44,11 +44,11 @@ Two things worth knowing before you pick numbers:
 ---
 ## 1.
 
-<!-- Your criterion. It must name a number. -->
+Of 10 pieces I wrote myself, at most 1 has guess ai on each of 3 trials.
 
 
-
-**Why this target:**
+**Why this target:** 
+I allow at most 1 false positive in 10 because on a writing site a wrong accusation costs more than a missed detection. A trial with 2 misses still fails.
 
 
 
@@ -56,11 +56,14 @@ Two things worth knowing before you pick numbers:
 
 ## 2.
 
-<!-- Your criterion. -->
+On each of 3 trials, the average combined score of 5 pieces listed as model-written is at least 0.25 above the average combined score of 5 pieces listed as mine.
 
 
 
-**Why this target:**
+
+**Why this target:** 
+In class, both signals scored a human poem near 0.5, and the combined score was near 0.5 too. I want 0.25 between those averages. The human average can still sit high, because my Milestone 1 trace has ordinary sentences at 0.71.
+
 
 
 
@@ -68,11 +71,12 @@ Two things worth knowing before you pick numbers:
 
 ## 3.
 
-<!-- Your criterion. -->
+On each of 3 trials, POST /submit responses include at least 1 guess human, at least 1 guess unsure, and at least 1 guess ai.
 
 
 
 **Why this target:**
+If no input can reach a label, the ranges have a gap. Each guess has to show up once a trial.
 
 
 
@@ -80,11 +84,12 @@ Two things worth knowing before you pick numbers:
 
 ## 4.
 
-<!-- Your criterion. -->
+I submit 5 pieces, then send POST /appeal for each content_id that comes back. All 5 responses have status under_review. The log then has 5 entries whose event is appeal, with those content_ids and status under_review.
 
 
 
 **Why this target:**
+An appeal that leaves the status unchanged still shows the writer the original accusation. The log entry is the record. I am counting 5 of 5.
 
 
 
@@ -92,11 +97,11 @@ Two things worth knowing before you pick numbers:
 
 ## 5.
 
-<!-- Your criterion. -->
-
+Each trial sends 3 bad bodies to POST /submit. One has no text field. One has text set to "". One has the word "word" repeated 50000 times. Each of those responses has no guess field. One normal sentence, sent right after, still comes back with guess set to human, unsure, or ai.
 
 
 **Why this target:**
+Those are the missing, empty, and enormous cases. A crash fails this. A guess on empty text fails it too. The normal sentence shows the service is still answering.
 
 
 
