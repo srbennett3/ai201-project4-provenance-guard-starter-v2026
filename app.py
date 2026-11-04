@@ -212,11 +212,17 @@ def submit():
     import detector
     model_score = detector.model_signal(text)
 
-    # Sets confidence, label, guess, and style_score to placeholders.
-    confidence = 0.0
+    # Scores the shape of the text with the style signal.
+    import stylometry
+    style_score = stylometry.style_signal(text)
+
+    # Combines the two scores into one confidence number.
+    import scoring
+    confidence = scoring.combine_signals(model_score, style_score)
+
+    # Leaves guess and label as placeholders.
     label = "placeholder"
     guess = "unsure"
-    style_score = 0.0
 
     # Writes the submission to the audit log.
     audit.log_decision(

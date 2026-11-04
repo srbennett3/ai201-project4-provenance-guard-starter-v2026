@@ -96,8 +96,12 @@ The meaning. Typos, broken-up sentences, and a pasted quotation would change the
      signals disagree? -->
 
 **The rule:**
+The combined score is 0.3 times the model score plus 0.7 times the style score. On the even AI paragraph the model score was 0.2337 and the style score was 0.8214, so the style score is the one that separates that paragraph from the human one.
+
 
 **The numbers:**
+WEIGHT_MODEL_SIGNAL is 0.3. WEIGHT_STYLE_SIGNAL is 0.7. The numbers are in config.py.
+
 
 **Where it lives:** `scoring.py::combine_signals`
 
@@ -105,7 +109,7 @@ The meaning. Typos, broken-up sentences, and a pasted quotation would change the
      somewhere else, say where. -->
 
 **A case where my two signals split, and what my rule does with it:**
-
+"I burned the rice and ate cereal instead." The model score is 0.0673 and the style score is 0.75. The combined score is 0.5452.
 
 
 ---

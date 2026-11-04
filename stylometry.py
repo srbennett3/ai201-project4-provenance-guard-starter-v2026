@@ -64,8 +64,26 @@ def sentence_length_spread(text: str) -> float:
     `stdev` raises on fewer than two values. Decide what that should return
     before the attack set decides for you.
     """
-    # TODO: replace this
-    return 0.0
+    # Counts the words in each sentence.
+    sentence_list = sentences(text)
+    lengths = []
+    for sentence in sentence_list:
+        word_list = words(sentence)
+        lengths.append(len(word_list))
+
+    # Returns 0 when there are fewer than 2 sentences.
+    if len(lengths) < 2:
+        return 0.0
+
+    # Divides the spread by the average length.
+    total = 0
+    for length in lengths:
+        total = total + length
+    mean_length = total / len(lengths)
+    if mean_length == 0:
+        return 0.0
+    spread = statistics.stdev(lengths) / mean_length
+    return round(spread, 4)
 
 
 def type_token_ratio(text: str) -> float:
@@ -80,8 +98,18 @@ def type_token_ratio(text: str) -> float:
     directly comparable on it, and if your test inputs vary a lot in length,
     that alone can look like a signal.
     """
-    # TODO: replace this
-    return 0.0
+    # Returns 0 when the text has no words.
+    word_list = words(text)
+    if len(word_list) == 0:
+        return 0.0
+
+    # Counts each word once, then divides by the total.
+    seen = []
+    for word in word_list:
+        if word not in seen:
+            seen.append(word)
+    ratio = len(seen) / len(word_list)
+    return round(ratio, 4)
 
 
 def punctuation_density(text: str) -> float:
@@ -94,8 +122,19 @@ def punctuation_density(text: str) -> float:
         more interesting than full stops, because they vary more between
         writers.
     """
-    # TODO: replace this
-    return 0.0
+    # Returns 0 when the text has no words.
+    word_list = words(text)
+    if len(word_list) == 0:
+        return 0.0
+
+    # Counts commas, semicolons, dashes, and question marks per word.
+    marks = ",;:!?-—"
+    count = 0
+    for character in text:
+        if character in marks:
+            count = count + 1
+    density = count / len(word_list)
+    return round(density, 4)
 
 
 # ── Combining them ───────────────────────────────────────────────────────────
@@ -122,8 +161,29 @@ def style_signal(text: str) -> float:
     you trust it. Plain and ordinary, not formal: formal prose reads as *human*
     to signal one, and it is plain writing that gets accused.
     """
-    # TODO: replace this
-    return 0.5
+    # Flips each measure so a high number means more likely AI.
+    spread = sentence_length_spread(text)
+    if spread > 1.0:
+        spread_score = 0.0
+    else:
+        spread_score = 1.0 - spread
+
+    ratio = type_token_ratio(text)
+    ratio_score = 1.0 - ratio
+
+    density = punctuation_density(text)
+    if density > 0.2:
+        punctuation_score = 0.0
+    else:
+        punctuation_score = 1.0 - (density / 0.2)
+
+    # Averages them. Sentence length spread is half of the score.
+    score = (0.5 * spread_score) + (0.25 * ratio_score) + (0.25 * punctuation_score)
+    if score < 0.0:
+        score = 0.0
+    if score > 1.0:
+        score = 1.0
+    return round(score, 4)
 
 
 if __name__ == "__main__":
