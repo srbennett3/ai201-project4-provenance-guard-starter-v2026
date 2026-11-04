@@ -220,9 +220,8 @@ def submit():
     import scoring
     confidence = scoring.combine_signals(model_score, style_score)
 
-    # Leaves guess and label as placeholders.
-    label = "placeholder"
-    guess = "unsure"
+    # Turns the combined score into a guess and a label.
+    guess, label = scoring.score_to_label(confidence)
 
     # Writes the submission to the audit log.
     audit.log_decision(
@@ -268,12 +267,32 @@ def appeal():
     """
     payload = request.get_json(silent=True) or {}
 
-    # TODO: delete this and build the route.
+    # Reads the id and the writer's reason.
+    content_id = payload.get("content_id", "")
+    reasoning = payload.get("reasoning", "")
+
+    # Looks up the original decision for this id.
+    matches = audit.entries_for(content_id)
+    if len(matches) == 0:
+        return jsonify({
+            "error": "not_found",
+            "message": "No submission has that content_id.",
+        }), 404
+
+    # Writes the appeal next to the original decision.
+    creator_id = matches[0].get("creator_id", "")
+    audit.log_appeal(
+        content_id=content_id,
+        creator_id=creator_id,
+        reasoning=reasoning,
+    )
+
+    # Tells the writer the appeal is recorded.
     return jsonify({
-        "error": "not_implemented",
-        "message": "POST /appeal isn't built yet — see the TODO in app.py.",
-        "you_sent": payload,
-    }), 501
+        "content_id": content_id,
+        "status": "under_review",
+        "message": "Your appeal is recorded.",
+    })
 
 
 # ── Already works ─────────────────────────────────────────────────────────────

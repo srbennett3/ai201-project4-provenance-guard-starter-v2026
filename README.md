@@ -123,14 +123,16 @@ WEIGHT_MODEL_SIGNAL is 0.3. WEIGHT_STYLE_SIGNAL is 0.7. The numbers are in confi
 
 | Label | Score range | The exact text a reader sees |
 |---|---|---|
-| high-confidence human |  |  |
-| unsure |  |  |
-| high-confidence AI |  |  |
+| high-confidence human | 0.00 – 0.35 | We think this was probably written by a person. |
+| unsure | 0.35 – 0.60 | We can't tell whether a person wrote this or an AI did. |
+| high-confidence AI | 0.60 – 1.00 | We think this was probably written by an AI. |
+
 
 **Why I worded the "unsure" one this way:**
 <!-- It's the hardest of the three. It has to admit uncertainty without
      sounding like an accusation, because the person reading it may well have
      written every word themselves. -->
+The person reading it may have written every word. The sentence says we can't tell, and it names a person and an AI as the two possibilities.
 
 
 
@@ -151,17 +153,17 @@ WEIGHT_MODEL_SIGNAL is 0.3. WEIGHT_STYLE_SIGNAL is 0.7. The numbers are in confi
 ```bash
 $ curl -X POST http://127.0.0.1:5000/submit \
   -H "Content-Type: application/json" \
-  -d '{"text": "I burned the rice and ate cereal instead.", "creator_id": "writer-1"}'
+  -d '{"text": "The system provides reliable results for users. The process supports clear results for teams. The design offersstable results for clients.", "creator_id": "writer-1"}'
 ```
 
 ```json
 {
-  "confidence": 0.0,
-  "content_id": "add867d2-ebe3-49df-a629-d99030329335",
-  "guess": "unsure",
-  "label": "placeholder",
-  "model_score": 0.0673,
-  "style_score": 0.0
+  "confidence": 0.6451,
+  "content_id": "3ddf66a9-fbc6-483c-8cc1-34950547cfe0",
+  "guess": "ai",
+  "label": "We think this was probably written by an AI.",
+  "model_score": 0.2337,
+  "style_score": 0.8214
 }
 ```
 
@@ -170,11 +172,15 @@ $ curl -X POST http://127.0.0.1:5000/submit \
 ```bash
 $ curl -X POST http://127.0.0.1:5000/appeal \
   -H "Content-Type: application/json" \
-  -d '{"content_id": "...", "reasoning": "..."}'
+  -d '{"content_id": "3ddf66a9-fbc6-483c-8cc1-34950547cfe0", "reasoning": "I wrote this."}'
 ```
 
 ```json
-
+{
+  "content_id": "3ddf66a9-fbc6-483c-8cc1-34950547cfe0",
+  "message": "Your appeal is recorded.",
+  "status": "under_review"
+}
 ```
 
 **What the log shows afterwards**
@@ -185,18 +191,37 @@ $ curl "http://127.0.0.1:5000/log?limit=3"
 
 ```json
 {
-  "count": 1,
+  "count": 3,
   "entries": [
     {
-      "combined_score": 0.0,
-      "content_id": "add867d2-ebe3-49df-a629-d99030329335",
+      "combined_score": 0.5452,
+      "content_id": "7ac108e3-7175-4877-a9bf-301b62dfcf1c",
       "creator_id": "writer-1",
       "guess": "unsure",
-      "label": "placeholder",
+      "label": "We can't tell whether a person wrote this or an AI did.",
       "model_score": 0.0673,
       "status": "decided",
-      "style_score": 0.0,
-      "timestamp": "2026-11-04T07:51:49+00:00"
+      "style_score": 0.75,
+      "timestamp": "2026-11-04T09:52:25+00:00"
+    },
+    {
+      "combined_score": 0.6451,
+      "content_id": "3ddf66a9-fbc6-483c-8cc1-34950547cfe0",
+      "creator_id": "writer-1",
+      "guess": "ai",
+      "label": "We think this was probably written by an AI.",
+      "model_score": 0.2337,
+      "status": "decided",
+      "style_score": 0.8214,
+      "timestamp": "2026-11-04T09:52:48+00:00"
+    },
+    {
+      "content_id": "3ddf66a9-fbc6-483c-8cc1-34950547cfe0",
+      "creator_id": "writer-1",
+      "event": "appeal",
+      "reasoning": "I wrote this.",
+      "status": "under_review",
+      "timestamp": "2026-11-04T10:13:35+00:00"
     }
   ]
 }
