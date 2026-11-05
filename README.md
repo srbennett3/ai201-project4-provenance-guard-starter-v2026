@@ -261,24 +261,29 @@ I set WEIGHT_MODEL_SIGNAL to 0.3 and WEIGHT_STYLE_SIGNAL to 0.7 in config.py, an
 
 ## Rate Limiting
 
-**My limits:** ___ per minute, ___ per day
+**My limits:** 7 per minute, 140 per day
 
 **Why those numbers and not others:**
 <!-- Think about two people: a real writer submitting their own work a few
      times an hour, and a script sending a thousand variations to map your
      thresholds. Your numbers have to be liveable for the first and hostile to
      the second. -->
+I set 7 a minute and 140 a day. A writer submitting their own work a few times an hour stays under 7 a minute. A script sending a thousand variations to map the thresholds hits 7 in the first minute, and 140 a day stops the rest of that run.
 
-**What a caller counts as:** <!-- per address, or per creator_id? They fail
+
+**What a caller counts as:** 
+<!-- per address, or per creator_id? They fail
 differently — one script can look like a thousand callers, and one household
 can look like one. -->
+per creator_id. A script that keeps one creator_id shares one count. A script that changes creator_id on each request looks like a thousand callers. When creator_id is missing, the count uses the caller's address.
+
 
 **The run of status codes when I pushed past it:**
 
 <!-- python run_attacks.py --flood 15 -->
 
 ```
-
+200 200 200 200 200 200 200 429 429 429 429 429 429 429 429
 ```
 
 ---
