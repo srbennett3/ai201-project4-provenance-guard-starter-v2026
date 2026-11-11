@@ -255,6 +255,18 @@ Drop the rule that keeps the lower score when the two signals are 0.30 apart. Us
 I set WEIGHT_MODEL_SIGNAL to 0.3 and WEIGHT_STYLE_SIGNAL to 0.7 in config.py, and combine_signals to that sum. A new submit put the even AI paragraph at 0.6451 and the lumpy human paragraph at 0.3113.
 
 
+**Moment 3**
+
+- *What I asked for:*
+I asked for the one change after the diagnosis, then both reruns.
+
+- *What came back:*
+Check the text in submit before either score. A missing field, a non-string, under 10 characters once stripped, or over 10000 characters returns status 400 and no guess.
+
+- *What I changed:*
+I put that check in app.py. The after run held 31 and broke 25. Criterion 5 came back 400, 400, 400, unsure on all 3 trials.
+
+
 <!-- ═══════════════════════ UNIT 8 — THE TEST ═══════════════════════ -->
 
 ---
@@ -1007,14 +1019,26 @@ The 11 rows that came back status 500, plus MF01 and MF08, now come back 400 wit
 <!-- For each attack still getting through and each criterion still missed:
      what you'd do, and why you stopped. -->
 
+No criterion missed on the after run. All 5 held.
 
+EV01, EV02, EV03, EV05, EV06, EV07, EV08, and EV09 still come back unsure. Raising the model weight catches EV03 at model score 0.6662. EV01 stays under 0.60 because its model score is 0.1635. I would add a check for the sentence shape. I stopped because the one change was the input check.
+
+FP02, FP03, FP04, FP05, and FP06 still come back guess ai. FP05 is the highest at 0.7157. I would move the ai line above 0.72. I left that move because EV04 at 0.619 would come back unsure, and it is a second change.
+
+PI02 still comes back human at 0.3271. I would move the human line under 0.3271. I left the human line where it is.
+
+MF04, MF06, and MF07 still come back guess ai. I would refuse text with no words, which is what leaves style_score at 1.0. The length check was the change I made.
+
+MF05 still comes back guess ai at 0.8243. model_score is 0.9976, and the text is one long word under the 10000-character cap. I would refuse a single repeated word. I left the cap at 10000.
+
+FL01_01 through FL01_07 still come back status 200. I would drop the minute limit under 7. I left it at 7 because a writer submitting a few times an hour was the reason for that number. FL01_08 already returns 429.
 
 **The trade I'd make if this ran for real:**
 
 <!-- Two sentences. Fewer wrong accusations means more AI text getting through.
      Say which way you'd go and WHO PAYS FOR IT. -->
 
-
+I'd move the ai line above 0.72, so FP02 through FP06 would stop coming back guess ai. The readers pay, because EV04 at 0.619 would come back unsure.
 
 <!-- ═════════════════════════════════════════════════════════════════════
 
