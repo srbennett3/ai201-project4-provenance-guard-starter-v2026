@@ -26,45 +26,71 @@ SCENARIOS = [
     {
         "name": "my own writing",
         "criterion": 1,
-        # ⚠️ PUT YOUR OWN WRITING HERE. Not AI text, not a sample from the web —
-        # things you actually wrote. This is the criterion that matters most and
-        # it's meaningless with someone else's prose.
+        # Ten pieces from criteria.md and the README.
         "texts": [
-            "REPLACE ME with a paragraph you wrote yourself.",
-            "REPLACE ME with another one. Ten pieces is the usual number.",
+            "I allow at most 1 false positive in 10 because on a writing site a wrong accusation costs more than a missed detection. A trial with 2 misses still fails.",
+            "In class, both signals scored a human poem near 0.5, and the combined score was near 0.5 too. I want 0.25 between those averages. The human average can still sit high, because my Milestone 1 trace has ordinary sentences at 0.71.",
+            "If no input can reach a label, the ranges have a gap. Each guess has to show up once a trial.",
+            "An appeal that leaves the status unchanged still shows the writer the original accusation. The log entry is the record. I am counting 5 of 5.",
+            "Those are the missing, empty, and enormous cases. A crash fails this. A guess on empty text fails it too. The normal sentence shows the service is still answering.",
+            "The combined score is 0.3 times the model score plus 0.7 times the style score. On the even AI paragraph the model score was 0.2337 and the style score was 0.8214, so the style score is the one that separates that paragraph from the human one.",
+            "I burned the rice and ate cereal instead. The model score is 0.0673 and the style score is 0.75. The combined score is 0.5452.",
+            "I asked why the rice curl returned a huge HTML page. The page was a Flask error. The bottom line was NameError: name 'detector' is not defined, on the model_signal call in app.py. The import detector line was missing. I added import detector inside submit, above the model_signal call. The next rice curl returned JSON, and model_score was 0.0673.",
+            'FP05 is the one I would least want to explain to the person who wrote it. The target was technical documentation written by a person. The service returned guess ai, model_score 0.8005, style_score 0.6794, and combined score 0.7157. The label was "We think this was probably written by an AI." The input starts "To configure the service, edit the settings file in the installation directory."',
+            "EV01 came back unsure at 0.4992. The style score stays 0.6431 when the misspellings are fixed, because the sentence lengths sit in a narrow band. detector.model_signal returned 0.1635. Those spellings are hard for gpt2 to predict. combine_signals weights the model score at 0.3, and the weighted score stays under 0.60 unless that score is near 0.50. The stage is signal one.",
+        ],
+    },
+    {
+        "name": "score spread",
+        "criterion": 2,
+        # Five even paragraphs listed as model-written, then five of mine.
+        "texts": [
+            "The system provides reliable results for users. The process supports clear results for teams. The design offers stable results for clients.",
+            "The report presents clear findings for readers. The method supports stable findings for reviewers. The section offers useful findings for partners.",
+            "The tool delivers consistent output for staff. The workflow maintains consistent output for managers. The update provides consistent output for clients.",
+            "The model produces accurate scores for texts. The service returns accurate scores for users. The page shows accurate scores for writers.",
+            "The check gives direct answers for authors. The log stores direct answers for appeals. The form sends direct answers for reviews.",
+            "I allow at most 1 false positive in 10 because on a writing site a wrong accusation costs more than a missed detection. A trial with 2 misses still fails.",
+            "In class, both signals scored a human poem near 0.5, and the combined score was near 0.5 too. I want 0.25 between those averages. The human average can still sit high, because my Milestone 1 trace has ordinary sentences at 0.71.",
+            "Those are the missing, empty, and enormous cases. A crash fails this. A guess on empty text fails it too. The normal sentence shows the service is still answering.",
+            "I asked why the rice curl returned a huge HTML page. The page was a Flask error. The bottom line was NameError: name 'detector' is not defined, on the model_signal call in app.py. The import detector line was missing. I added import detector inside submit, above the model_signal call. The next rice curl returned JSON, and model_score was 0.0673.",
+            "EV01 came back unsure at 0.4992. The style score stays 0.6431 when the misspellings are fixed, because the sentence lengths sit in a narrow band. detector.model_signal returned 0.1635. Those spellings are hard for gpt2 to predict. combine_signals weights the model score at 0.3, and the weighted score stays under 0.60 unless that score is near 0.50. The stage is signal one.",
         ],
     },
     {
         "name": "label coverage",
-        "criterion": 2,
-        # Inputs spread across your score range, so you can check all three
-        # labels are actually reachable.
+        "criterion": 3,
+        # One input in each band. human, then unsure, then ai.
         "texts": [
-            "REPLACE ME with something you're confident is AI-generated.",
-            "REPLACE ME with something you're confident is human-written.",
-            "REPLACE ME with something genuinely borderline.",
+            "Huh. The saucepan seized, the grains carbonized along the rim, and I ate the stale cereal instead of scraping that blackened pot again, since the market had already locked its gate.",
+            "I burned the rice and ate cereal instead.",
+            "The system provides reliable results for users. The process supports clear results for teams. The design offers stable results for clients.",
         ],
     },
-    # A bad-input criterion looks like this. Uncomment and adjust if that's one
-    # of your five — these are raw request bodies, sent exactly as written.
-    #
-    # {
-    #     "name": "bad input",
-    #     "criterion": 3,
-    #     "bodies": [
-    #         {"text": "", "creator_id": "eval_bad_empty"},
-    #         {"creator_id": "eval_bad_missing"},          # no text field at all
-    #         {"text": "word " * 50000, "creator_id": "eval_bad_huge"},
-    #         {"text": None, "creator_id": "eval_bad_null"},
-    #     ],
-    # },
-
-    # TODO: add what your remaining criteria need.
-    #
-    # A criterion about the appeal path can't be tested by sending text alone;
-    # it needs a submission first and then an appeal against the content_id
-    # that came back. You'll need to test that one by hand, or extend this file
-    # and run_eval.py to do it. Saying which you did is part of the write-up.
+    {
+        "name": "appeal path",
+        "criterion": 4,
+        # run_eval.py posts /appeal after each submit when appeal is True.
+        "appeal": True,
+        "texts": [
+            "I allow at most 1 false positive in 10 because on a writing site a wrong accusation costs more than a missed detection. A trial with 2 misses still fails.",
+            "In class, both signals scored a human poem near 0.5, and the combined score was near 0.5 too. I want 0.25 between those averages. The human average can still sit high, because my Milestone 1 trace has ordinary sentences at 0.71.",
+            "If no input can reach a label, the ranges have a gap. Each guess has to show up once a trial.",
+            "An appeal that leaves the status unchanged still shows the writer the original accusation. The log entry is the record. I am counting 5 of 5.",
+            "Those are the missing, empty, and enormous cases. A crash fails this. A guess on empty text fails it too. The normal sentence shows the service is still answering.",
+        ],
+    },
+    {
+        "name": "bad input",
+        "criterion": 5,
+        # Missing field, empty text, enormous text, then one normal sentence.
+        "bodies": [
+            {"creator_id": "eval_bad_missing"},
+            {"text": "", "creator_id": "eval_bad_empty"},
+            {"text": "word " * 50000, "creator_id": "eval_bad_huge"},
+            {"text": "I burned the rice and ate cereal instead.", "creator_id": "eval_bad_ok"},
+        ],
+    },
 ]
 
 

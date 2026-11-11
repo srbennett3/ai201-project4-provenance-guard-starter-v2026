@@ -483,17 +483,387 @@ FP05 is the one I would least want to explain to the person who wrote it. The ta
 
 | Criterion | Target | Run 1 | Run 2 | Run 3 | Verdict |
 |---|---|---|---|---|---|
-| 1.  |  |  |  |  |  |
-| 2.  |  |  |  |  |  |
-| 3.  |  |  |  |  |  |
-| 4.  |  |  |  |  |  |
-| 5.  |  |  |  |  |  |
+| 1. False positives | at most 1 guess ai in 10 | 1 of 10 | 1 of 10 | 1 of 10 | MET |
+| 2. Score spread | model average at least 0.25 above mine | 0.2576 | 0.2576 | 0.2576 | MET |
+| 3. Label coverage | 1 human, 1 unsure, and 1 ai | human, unsure, ai | human, unsure, ai | human, unsure, ai | MET |
+| 4. Appeal path | 5 of 5 status under_review, and 5 appeal log lines | 5 of 5 | 5 of 5 | 5 of 5 | MET |
+| 5. Bad input | 3 bad bodies have no guess, then 1 normal guess | null, null, ai, unsure | null, null, ai, unsure | null, null, ai, unsure | MISSED |
 
 **Real output from one trial**, pasted as text, naming the file and function
 that produced it:
 
-```json
+Trial 1 of each criterion is below. Trials 2 and 3 matched trial 1. run_eval.py main wrote results/run_2026-11-11_0258_before.md. app.py submit returned the submit JSON. I extended run_eval.py so that command calls app.py appeal after each submit in the appeal scenario. The 5 log lines under the appeal block are from logs/audit.jsonl.
 
+**my own writing, trial 1**
+
+```json
+[
+  {
+    "status": 200,
+    "guess": "human",
+    "confidence": 0.2966,
+    "model_score": 0.0603,
+    "style_score": 0.3979,
+    "label": "We think this was probably written by a person.",
+    "sent": "I allow at most 1 false positive in 10 because on a writing site a wro"
+  },
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.3699,
+    "model_score": 0.1311,
+    "style_score": 0.4722,
+    "label": "We can't tell whether a person wrote this or an AI did.",
+    "sent": "In class, both signals scored a human poem near 0.5, and the combined "
+  },
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.4639,
+    "model_score": 0.1152,
+    "style_score": 0.6133,
+    "label": "We can't tell whether a person wrote this or an AI did.",
+    "sent": "If no input can reach a label, the ranges have a gap. Each guess has t"
+  },
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.393,
+    "model_score": 0.0696,
+    "style_score": 0.5316,
+    "label": "We can't tell whether a person wrote this or an AI did.",
+    "sent": "An appeal that leaves the status unchanged still shows the writer the "
+  },
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.4039,
+    "model_score": 0.054,
+    "style_score": 0.5539,
+    "label": "We can't tell whether a person wrote this or an AI did.",
+    "sent": "Those are the missing, empty, and enormous cases. A crash fails this. "
+  },
+  {
+    "status": 200,
+    "guess": "ai",
+    "confidence": 0.6077,
+    "model_score": 0.57,
+    "style_score": 0.6238,
+    "label": "We think this was probably written by an AI.",
+    "sent": "The combined score is 0.3 times the model score plus 0.7 times the sty"
+  },
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.5851,
+    "model_score": 0.4518,
+    "style_score": 0.6423,
+    "label": "We can't tell whether a person wrote this or an AI did.",
+    "sent": "I burned the rice and ate cereal instead. The model score is 0.0673 an"
+  },
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.4461,
+    "model_score": 0.2062,
+    "style_score": 0.5489,
+    "label": "We can't tell whether a person wrote this or an AI did.",
+    "sent": "I asked why the rice curl returned a huge HTML page. The page was a Fl"
+  },
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.473,
+    "model_score": 0.3127,
+    "style_score": 0.5417,
+    "label": "We can't tell whether a person wrote this or an AI did.",
+    "sent": "FP05 is the one I would least want to explain to the person who wrote "
+  },
+  {
+    "status": 200,
+    "guess": "human",
+    "confidence": 0.3489,
+    "model_score": 0.1545,
+    "style_score": 0.4322,
+    "label": "We think this was probably written by a person.",
+    "sent": "EV01 came back unsure at 0.4992. The style score stays 0.6431 when the"
+  }
+]
+```
+
+**score spread, trial 1**
+
+```json
+[
+  {
+    "status": 200,
+    "guess": "ai",
+    "confidence": 0.6451,
+    "model_score": 0.2337,
+    "style_score": 0.8214,
+    "label": "We think this was probably written by an AI.",
+    "sent": "The system provides reliable results for users. The process supports c"
+  },
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.593,
+    "model_score": 0.0602,
+    "style_score": 0.8214,
+    "label": "We can't tell whether a person wrote this or an AI did.",
+    "sent": "The report presents clear findings for readers. The method supports st"
+  },
+  {
+    "status": 200,
+    "guess": "ai",
+    "confidence": 0.6484,
+    "model_score": 0.1891,
+    "style_score": 0.8453,
+    "label": "We think this was probably written by an AI.",
+    "sent": "The tool delivers consistent output for staff. The workflow maintains "
+  },
+  {
+    "status": 200,
+    "guess": "ai",
+    "confidence": 0.642,
+    "model_score": 0.1677,
+    "style_score": 0.8453,
+    "label": "We think this was probably written by an AI.",
+    "sent": "The model produces accurate scores for texts. The service returns accu"
+  },
+  {
+    "status": 200,
+    "guess": "ai",
+    "confidence": 0.625,
+    "model_score": 0.1108,
+    "style_score": 0.8453,
+    "label": "We think this was probably written by an AI.",
+    "sent": "The check gives direct answers for authors. The log stores direct answ"
+  },
+  {
+    "status": 200,
+    "guess": "human",
+    "confidence": 0.2966,
+    "model_score": 0.0603,
+    "style_score": 0.3979,
+    "label": "We think this was probably written by a person.",
+    "sent": "I allow at most 1 false positive in 10 because on a writing site a wro"
+  },
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.3699,
+    "model_score": 0.1311,
+    "style_score": 0.4722,
+    "label": "We can't tell whether a person wrote this or an AI did.",
+    "sent": "In class, both signals scored a human poem near 0.5, and the combined "
+  },
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.4039,
+    "model_score": 0.054,
+    "style_score": 0.5539,
+    "label": "We can't tell whether a person wrote this or an AI did.",
+    "sent": "Those are the missing, empty, and enormous cases. A crash fails this. "
+  },
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.4461,
+    "model_score": 0.2062,
+    "style_score": 0.5489,
+    "label": "We can't tell whether a person wrote this or an AI did.",
+    "sent": "I asked why the rice curl returned a huge HTML page. The page was a Fl"
+  },
+  {
+    "status": 200,
+    "guess": "human",
+    "confidence": 0.3489,
+    "model_score": 0.1545,
+    "style_score": 0.4322,
+    "label": "We think this was probably written by a person.",
+    "sent": "EV01 came back unsure at 0.4992. The style score stays 0.6431 when the"
+  }
+]
+```
+
+**label coverage, trial 1**
+
+```json
+[
+  {
+    "status": 200,
+    "guess": "human",
+    "confidence": 0.1391,
+    "model_score": 0.0872,
+    "style_score": 0.1613,
+    "label": "We think this was probably written by a person.",
+    "sent": "Huh. The saucepan seized, the grains carbonized along the rim, and I a"
+  },
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.5452,
+    "model_score": 0.0673,
+    "style_score": 0.75,
+    "label": "We can't tell whether a person wrote this or an AI did.",
+    "sent": "I burned the rice and ate cereal instead."
+  },
+  {
+    "status": 200,
+    "guess": "ai",
+    "confidence": 0.6451,
+    "model_score": 0.2337,
+    "style_score": 0.8214,
+    "label": "We think this was probably written by an AI.",
+    "sent": "The system provides reliable results for users. The process supports c"
+  }
+]
+```
+
+**appeal path, trial 1**
+
+```json
+[
+  {
+    "status": 200,
+    "guess": "human",
+    "confidence": 0.2966,
+    "model_score": 0.0603,
+    "style_score": 0.3979,
+    "label": "We think this was probably written by a person.",
+    "sent": "I allow at most 1 false positive in 10 because on a writing site a wro",
+    "content_id": "89f9d4ce-3b3e-4114-8768-ee05e771fbc8",
+    "appeal_status": "under_review"
+  },
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.3699,
+    "model_score": 0.1311,
+    "style_score": 0.4722,
+    "label": "We can't tell whether a person wrote this or an AI did.",
+    "sent": "In class, both signals scored a human poem near 0.5, and the combined ",
+    "content_id": "6c8de2e2-0831-40b6-afa7-355a223486c3",
+    "appeal_status": "under_review"
+  },
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.4639,
+    "model_score": 0.1152,
+    "style_score": 0.6133,
+    "label": "We can't tell whether a person wrote this or an AI did.",
+    "sent": "If no input can reach a label, the ranges have a gap. Each guess has t",
+    "content_id": "7488bd01-a556-4eef-afd5-a360aa8c0070",
+    "appeal_status": "under_review"
+  },
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.393,
+    "model_score": 0.0696,
+    "style_score": 0.5316,
+    "label": "We can't tell whether a person wrote this or an AI did.",
+    "sent": "An appeal that leaves the status unchanged still shows the writer the ",
+    "content_id": "8eecfa03-ec47-4feb-8e43-61c9b104b291",
+    "appeal_status": "under_review"
+  },
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.4039,
+    "model_score": 0.054,
+    "style_score": 0.5539,
+    "label": "We can't tell whether a person wrote this or an AI did.",
+    "sent": "Those are the missing, empty, and enormous cases. A crash fails this. ",
+    "content_id": "d5db8614-1161-402c-b5a8-94a46607abf0",
+    "appeal_status": "under_review"
+  }
+]
+```
+
+**appeal path, trial 1, from logs/audit.jsonl. audit.py log_appeal wrote these.**
+
+```json
+[
+  {
+    "timestamp": "2026-11-11T10:58:08+00:00",
+    "content_id": "89f9d4ce-3b3e-4114-8768-ee05e771fbc8",
+    "creator_id": "eval_appeal path_1",
+    "event": "appeal",
+    "status": "under_review",
+    "reasoning": "I wrote this."
+  },
+  {
+    "timestamp": "2026-11-11T10:58:09+00:00",
+    "content_id": "6c8de2e2-0831-40b6-afa7-355a223486c3",
+    "creator_id": "eval_appeal path_2",
+    "event": "appeal",
+    "status": "under_review",
+    "reasoning": "I wrote this."
+  },
+  {
+    "timestamp": "2026-11-11T10:58:09+00:00",
+    "content_id": "7488bd01-a556-4eef-afd5-a360aa8c0070",
+    "creator_id": "eval_appeal path_3",
+    "event": "appeal",
+    "status": "under_review",
+    "reasoning": "I wrote this."
+  },
+  {
+    "timestamp": "2026-11-11T10:58:09+00:00",
+    "content_id": "8eecfa03-ec47-4feb-8e43-61c9b104b291",
+    "creator_id": "eval_appeal path_4",
+    "event": "appeal",
+    "status": "under_review",
+    "reasoning": "I wrote this."
+  },
+  {
+    "timestamp": "2026-11-11T10:58:09+00:00",
+    "content_id": "d5db8614-1161-402c-b5a8-94a46607abf0",
+    "creator_id": "eval_appeal path_5",
+    "event": "appeal",
+    "status": "under_review",
+    "reasoning": "I wrote this."
+  }
+]
+```
+
+**bad input, trial 1**
+
+```json
+[
+  {
+    "status": null,
+    "error": "JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
+    "sent": "{\"creator_id\": \"eval_bad_missing\"}"
+  },
+  {
+    "status": null,
+    "error": "JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
+    "sent": "(empty text)"
+  },
+  {
+    "status": 200,
+    "guess": "ai",
+    "confidence": 0.9992,
+    "model_score": 0.9975,
+    "style_score": 1.0,
+    "label": "We think this was probably written by an AI.",
+    "sent": "word word word word word word word word word word word word word word "
+  },
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.5452,
+    "model_score": 0.0673,
+    "style_score": 0.75,
+    "label": "We can't tell whether a person wrote this or an AI did.",
+    "sent": "I burned the rice and ate cereal instead."
+  }
+]
 ```
 
 **Diagnoses**
