@@ -917,19 +917,86 @@ FL01_01 through FL01_07 came back status 200. RATE_LIMIT_PER_MINUTE is 7, so the
 ## The Improvement
 
 **What I changed:**
+submit checks the text before either score. If the text is not a string, is under 10 characters once stripped, or is over 10000 characters, the response is status 400 and has no guess.
 
 **Which diagnosis pointed at it:**
+Criterion 5 missed because a missing field and an empty string crashed in the route. MF02 and 10 other rows came back status 500 from that same call.
 
 ### Attack Run — After
 
 <!-- Same format. `run_attacks.py --label after` -->
 
+Held: 31. Broke: 25.
 
+| ID | Family | Targeting | Status | Content ID | Guess | Score | Verdict |
+|---|---|---|---|---|---|---|---|
+| EV01 | evasion | signal two: typos raise word variety | 200 | `820bb89d-120b-45cf-b142-3705b5f7481f` | unsure | 0.499 | BROKE |
+| EV02 | evasion | signal two: broken-up sentences raise length spread | 200 | `402a1b06-ff0f-4f7e-95b6-29541a98b6d3` | unsure | 0.398 | BROKE |
+| EV03 | evasion | signal two: a pasted quotation changes the shape | 200 | `3efa0e50-5261-4676-9bd2-72709a41cb9e` | unsure | 0.548 | BROKE |
+| EV04 | evasion | signal one: unusual words raise perplexity | 200 | `52281113-6895-4f40-9422-1c338bcf205b` | ai | 0.619 | HELD |
+| EV05 | evasion | both signals: heavy human editing pass | 200 | `6c2de394-6a5e-4254-8d14-78b75e7f6be6` | unsure | 0.351 | BROKE |
+| EV06 | evasion | signal two: one very long sentence and one very short | 200 | `e916765c-60d2-4dec-819f-a47d8a1060c9` | unsure | 0.362 | BROKE |
+| EV07 | evasion | signal two: padding with punctuation | 200 | `49a9fb5e-ed24-47d0-a20a-3931b930afe9` | unsure | 0.566 | BROKE |
+| EV08 | evasion | signal one: text below the token window | 200 | `6f58ebef-d1b9-41aa-8f32-690eeaf5b615` | unsure | 0.500 | BROKE |
+| EV09 | evasion | both: AI text with a human opening paragraph bolted on | 200 | `b23fc639-6978-4b8b-a342-97c9abb79514` | unsure | 0.552 | BROKE |
+| EV10 | evasion | signal two: repeated stanza structure | 200 | `4f099cc0-8d3f-4f06-b4f7-fee89aae09e2` | ai | 0.800 | HELD |
+| FP01 | false_positive | plain, clear human writing with no flourishes | 200 | `8fbad5e9-7672-457f-a37f-627b315acd6f` | unsure | 0.584 | HELD |
+| FP02 | false_positive | human writing in a formal register | 200 | `565e237e-7c7b-419c-85fa-9dd44d47eec4` | ai | 0.702 | BROKE |
+| FP03 | false_positive | a non-native English speaker writing carefully | 200 | `f056d0b7-6dcc-448d-a970-16c33910c4db` | ai | 0.700 | BROKE |
+| FP04 | false_positive | a student essay written to a rubric | 200 | `62e63310-ba6c-491b-b7d6-c35404ed4a07` | ai | 0.667 | BROKE |
+| FP05 | false_positive | technical documentation written by a person | 200 | `1f6135d2-8659-4509-8bb7-ba48b2ee58a6` | ai | 0.716 | BROKE |
+| FP06 | false_positive | a person imitating a formal template | 200 | `ee8df635-4c02-4fd0-835a-4f19b87150c5` | ai | 0.640 | BROKE |
+| FP07 | false_positive | human writing that repeats a phrase deliberately | 200 | `0366d319-f47a-4cac-ba65-7d655434f270` | unsure | 0.599 | HELD |
+| FP08 | false_positive | very short genuine human submission | 200 | `12103ee5-1b2a-4036-98cb-49e1a5ce58b9` | unsure | 0.470 | HELD |
+| PI01 | prompt_injection | instruction to ignore the check | 200 | `d66fe10a-6c54-492e-847d-6e97858f0872` | unsure | 0.444 | HELD |
+| PI02 | prompt_injection | instruction disguised as a system message | 200 | `c304a864-0616-470e-8da2-8cf8327671de` | human | 0.327 | BROKE |
+| PI03 | prompt_injection | instruction wrapped in the writer's voice | 200 | `82cf8b47-1063-4140-98a6-94fa2ecdeebf` | unsure | 0.583 | HELD |
+| PI04 | prompt_injection | attempt to make the label text hostile | 200 | `acb97f29-ac99-4588-b329-e8a879c6f3c9` | unsure | 0.526 | HELD |
+| PI05 | prompt_injection | attempt to inject into the audit log | 200 | `20a00bb2-eeb5-48ff-918f-33e35565a42e` | unsure | 0.383 | HELD |
+| PI06 | prompt_injection | instruction plus real human text | 200 | `68d560c0-07e3-41c9-b6b1-2e3ff9af4571` | unsure | 0.572 | HELD |
+| MF01 | malformed | text is only whitespace | 400 | `—` | — | — | HELD |
+| MF02 | malformed | text is a single character | 400 | `—` | — | — | HELD |
+| MF03 | malformed | text is control characters | 200 | `89d3d5b8-54a1-4cc3-89d6-7670801c812e` | unsure | 0.525 | HELD |
+| MF04 | malformed | text is only punctuation | 200 | `ab39a020-9d2d-4d35-9758-7277310c580c` | ai | 0.703 | BROKE |
+| MF05 | malformed | text is a very long single word | 200 | `03f9835e-543c-42d7-83f9-a71cfd596638` | ai | 0.824 | BROKE |
+| MF06 | malformed | text is emoji only | 200 | `f4300c44-ff9d-47a1-bfc7-101254521e46` | ai | 0.999 | BROKE |
+| MF07 | malformed | text is right-to-left script | 200 | `ce64f28f-0bdb-42f3-a693-ccce41a543d5` | ai | 0.972 | BROKE |
+| MF08 | malformed | text is 60,000 characters | 400 | `—` | — | — | HELD |
+| RQ01 | malformed | no text field at all | 400 | `—` | — | — | HELD |
+| RQ02 | malformed | no creator_id | 200 | `9e48ae5a-7d91-44dd-883b-b43a4eb85532` | unsure | 0.597 | HELD |
+| RQ03 | malformed | text is a number | 400 | `—` | — | — | HELD |
+| RQ04 | malformed | text is a list | 400 | `—` | — | — | HELD |
+| RQ05 | malformed | text is null | 400 | `—` | — | — | HELD |
+| RQ06 | malformed | creator_id is an object | 200 | `d3095813-0fd5-40df-ab3f-5f6538cb4e1c` | unsure | 0.540 | HELD |
+| RQ07 | malformed | body is a JSON array, not an object | 400 | `—` | — | — | HELD |
+| RQ08 | malformed | body is unparseable JSON | 400 | `—` | — | — | HELD |
+| RQ09 | malformed | body is empty | 400 | `—` | — | — | HELD |
+| RQ10 | malformed | body is form-encoded, not JSON | 400 | `—` | — | — | HELD |
+| RQ11 | malformed | body is JSON claiming to be plain text | 400 | `—` | — | — | HELD |
+| RQ12 | malformed | deeply nested JSON | 400 | `—` | — | — | HELD |
+| FL01_01 | flood_same_creator | 20 rapid submissions from one creator | 200 | `eb420404-9787-423c-8579-15eb12e151e8` | unsure | 0.534 | BROKE |
+| FL01_02 | flood_same_creator | 20 rapid submissions from one creator | 200 | `7c1129ff-370c-4223-afbc-7ef7a8c43519` | unsure | 0.534 | BROKE |
+| FL01_03 | flood_same_creator | 20 rapid submissions from one creator | 200 | `54508c1b-684c-4930-bcfd-bb20c373af2c` | unsure | 0.534 | BROKE |
+| FL01_04 | flood_same_creator | 20 rapid submissions from one creator | 200 | `e1061010-c689-456e-b409-aab2a88884ef` | unsure | 0.534 | BROKE |
+| FL01_05 | flood_same_creator | 20 rapid submissions from one creator | 200 | `b15f75f0-b82a-4207-a4f9-2526c9a382b7` | unsure | 0.534 | BROKE |
+| FL01_06 | flood_same_creator | 20 rapid submissions from one creator | 200 | `81798396-2009-4890-b8cd-6b8f2b2b8fdb` | unsure | 0.534 | BROKE |
+| FL01_07 | flood_same_creator | 20 rapid submissions from one creator | 200 | `dd623baf-0fc2-4f8c-9120-9d745337929b` | unsure | 0.534 | BROKE |
+| FL01_08 | flood_same_creator | 20 rapid submissions from one creator | 429 | `—` | — | — | HELD |
+| FL01_09 | flood_same_creator | 20 rapid submissions from one creator | 429 | `—` | — | — | HELD |
+| FL01_10 | flood_same_creator | 20 rapid submissions from one creator | 429 | `—` | — | — | HELD |
+| FL01_11 | flood_same_creator | 20 rapid submissions from one creator | 429 | `—` | — | — | HELD |
+| FL01_12 | flood_same_creator | 20 rapid submissions from one creator | 429 | `—` | — | — | HELD |
 
 **Did it help, and how do I know:**
+The 11 rows that came back status 500, plus MF01 and MF08, now come back 400 with no guess. Held is 31 and broke is 25. The before run was 18 held and 38 broke. Evasion, the false positives, PI02, and the first 7 flood rows are the same. Criterion 5 is 400, 400, 400, unsure on all 3 trials. Criteria 1 through 4 matched the before run. MF04, MF05, MF06, and MF07 still come back guess ai.
 
-<!-- Widening the unsure band usually fixes one problem and creates another.
-     Reporting that trade honestly is worth full credit. -->
+| Criterion | Before | After |
+|---|---|---|
+| 1. False positives | MET, 1 of 10 | MET, 1 of 10 |
+| 2. Score spread | MET, 0.2576 | MET, 0.2576 |
+| 3. Label coverage | MET | MET |
+| 4. Appeal path | MET, 5 of 5 | MET, 5 of 5 |
+| 5. Bad input | MISSED, null, null, ai, unsure | MET, 400, 400, 400, unsure |
 
 
 

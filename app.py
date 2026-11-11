@@ -199,11 +199,25 @@ def submit():
     what should this do when `text` is missing, empty, or enormous? A crash on
     a malformed input is one of the most common real failures there is.
     """
-    payload = request.get_json(silent=True) or {}
+    payload = request.get_json(silent=True)
+    if not isinstance(payload, dict):
+        payload = {}
 
     # Reads the submitted text and the creator id.
     text = payload.get("text", "")
     creator_id = payload.get("creator_id", "")
+    if not isinstance(creator_id, str) or creator_id == "":
+        creator_for_log = "unknown"
+    else:
+        creator_for_log = creator_id
+
+    # Refuses text that is missing, empty, too short, or enormous.
+    if (not isinstance(text, str)) or (len(text.strip()) < 10) or (len(text) > 10000):
+        audit.log_rejection(creator_id=creator_for_log, reason="bad_input")
+        return jsonify({
+            "error": "bad_input",
+            "message": "Text is missing, empty, or too long to score.",
+        }), 400
 
     # Builds an id the appeal route can look up later.
     content_id = str(uuid.uuid4())
