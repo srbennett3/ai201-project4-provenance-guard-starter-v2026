@@ -881,7 +881,35 @@ Trial 1 of each criterion is below. Trials 2 and 3 matched trial 1. run_eval.py 
                         signal at 0.6, so it dragged the whole score down."
 
      Look for a pattern. Five failures on one signal is one problem, not five. -->
+Criterion 1 held. Each of the 3 trials had 1 guess ai in 10, the combining-rule paragraph at 0.6077.
+
+Criterion 2 held. Each of the 3 trials had a gap of 0.2576.
+
+Criterion 3 held. Each of the 3 trials had guess human, unsure, and ai.
+
+Criterion 4 held. Each of the 3 trials had 5 of 5 appeals at status under_review, with those content ids in the log.
+
+Criterion 5 missed on all 3 trials. Each trial was null, null, ai, unsure. The missing field and the empty string are the route. detector.perplexity raises ValueError under 3 tokens, and the response is not JSON. The repeated word is signal two. style_signal is 1.0, and the 0.7 weight is already over 0.60. The normal sentence came back unsure.
+
 EV01 came back unsure at 0.4992. The style score stays 0.6431 when the misspellings are fixed, because the sentence lengths sit in a narrow band. detector.model_signal returned 0.1635. Those spellings are hard for gpt2 to predict. combine_signals weights the model score at 0.3, and the weighted score stays under 0.60 unless that score is near 0.50. The stage is signal one.
+
+EV02, EV03, EV06, EV07, and EV09 came back unsure. Broken-up sentences, a pasted quotation, one long sentence next to one short one, extra punctuation, and a human opening paragraph move style_signal down. combine_signals weights that score at 0.7, so the sum stays under 0.60. The stage is signal two.
+
+EV05 came back unsure at 0.3508. model_signal was 0.3212 and style_signal was 0.3635, and the weighted sum stays under 0.60. The stage is signal one and signal two.
+
+EV08 came back unsure at 0.4996. The text is under the token window, so model_signal is 0.2452 against style_signal 0.6086. At a 0.3 weight the combined score stays under 0.60. The stage is signal one.
+
+FP02, FP03, FP04, FP05, and FP06 came back guess ai. The highest style score is 0.6857, and 0.7 times 0.6857 is 0.480, under 0.60. model_signal clears the line. The stage is signal one, because this formal and technical prose is predictable to gpt2.
+
+PI02 came back guess human at 0.3271, from model_signal 0.2044 and style_signal 0.3797. score_to_label returns human at or under 0.35. The stage is the label mapping.
+
+MF02, RQ01, RQ03, RQ04, RQ05, RQ07, RQ08, RQ09, RQ10, RQ11, and RQ12 came back status 500. The stage is the route. submit sends the body to detector.model_signal with no check. On MF02 the traceback was ValueError in detector.perplexity, "Text is too short to score".
+
+MF01, MF04, MF06, and MF07 came back guess ai with style_score 1.0. The 0.7 weight on that is 0.70, over 0.60. Whitespace, punctuation, emoji, and right-to-left text leave few words and no sentence-length spread. The stage is signal two. MF01's model_score was 0.2053.
+
+MF05 and MF08 came back guess ai. The style share is 0.525 and 0.532, under 0.60. model_signal was 0.9976 and 0.9876. A long repeated string is easy for gpt2 to predict. The stage is signal one.
+
+FL01_01 through FL01_07 came back status 200. RATE_LIMIT_PER_MINUTE is 7, so the first 7 submissions from one creator are accepted. The stage is the route.
 
 
 ---
